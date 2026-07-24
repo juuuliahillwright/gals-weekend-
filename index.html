@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gals' Weekend — Pick a House</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
+
+  :root{
+    --bg:#F1E8ED; --ink:#2A1B2D; --wine:#7A2E48; --gold:#B9852A;
+    --sage:#5F7452; --card:#FBF6F8; --line:#E0CDD6; --muted:#7C6975;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;}
+  .sheet{max-width:960px;margin:0 auto;padding:32px 36px 28px;}
+
+  .eyebrow{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:7px;}
+  h1{font-family:'Fraunces',serif;font-weight:600;font-size:40px;line-height:1.05;margin:0 0 8px;letter-spacing:-0.01em;}
+  h1 em{color:var(--wine);font-style:italic;}
+  .sub{font-size:13px;color:var(--muted);margin:0;}
+  .sub b{color:var(--ink);font-weight:600;}
+  .hr{height:1px;background:var(--line);margin:20px 0;border:0;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;}
+  .card.pick{border-color:var(--gold);box-shadow:0 0 0 1.5px var(--gold) inset;}
+
+  /* photo slot */
+  .slot{position:relative;aspect-ratio:16/10;background:#EFE3E9;cursor:pointer;overflow:hidden;display:block;width:100%;border:0;padding:0;}
+  .slot img{width:100%;height:100%;object-fit:cover;display:block;}
+  .slot .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    background:repeating-linear-gradient(45deg,#EFE3E9,#EFE3E9 9px,#E8D8E0 9px,#E8D8E0 18px);color:var(--muted);}
+  .slot .ph span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;}
+  .slot .ph small{font-size:10px;}
+  .slot .swap{position:absolute;bottom:7px;right:7px;background:rgba(42,27,45,.72);color:#fff;font-size:9.5px;
+    letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;opacity:0;transition:opacity .18s;}
+  .slot:hover .swap,.slot:focus-visible .swap{opacity:1;}
+  .slot:focus-visible{outline:2px solid var(--wine);outline-offset:-2px;}
+  .badge{position:absolute;top:10px;left:10px;background:var(--wine);color:#fff;font-size:9.5px;letter-spacing:.12em;
+    text-transform:uppercase;font-weight:600;padding:3px 9px;border-radius:20px;}
+  .badge.gold{background:var(--gold);}
+
+  .body{padding:13px 15px 14px;}
+  .name{font-family:'Fraunces',serif;font-size:17px;font-weight:600;margin:0 0 1px;}
+  .where{font-size:10.5px;color:var(--muted);letter-spacing:.02em;margin-bottom:8px;}
+  .where b{color:var(--gold);}
+  .cost{display:flex;align-items:baseline;gap:7px;margin-bottom:9px;}
+  .cost .n{font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:var(--wine);}
+  .cost .u{font-size:10.5px;color:var(--muted);}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px;}
+  .c{font-size:10px;padding:2.5px 8px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--muted);}
+  .c.on{background:#EAF0E4;color:var(--sage);border-color:#CBDBBB;font-weight:600;}
+  .c.off{background:#F7E7EC;color:#9A5064;border-color:#EBC9D3;}
+  .line{font-size:12px;margin:0 0 3px;display:flex;gap:6px;}
+  .line b{flex-shrink:0;}
+  .line.up b{color:var(--sage);}
+  .line.dn b{color:#B0526A;}
+  .line.dn{color:var(--muted);}
+
+  a.name{color:var(--ink);text-decoration:none;display:inline-block;}
+  a.name:hover{color:var(--wine);text-decoration:underline;text-underline-offset:3px;}
+  a.name:focus-visible{outline:2px solid var(--wine);outline-offset:2px;border-radius:3px;}
+  .view{display:inline-flex;align-items:center;gap:5px;margin-top:9px;font-size:10.5px;font-weight:600;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--wine);text-decoration:none;
+    border:1px solid var(--wine);border-radius:20px;padding:4px 11px;transition:background .15s,color .15s;}
+  .view:hover{background:var(--wine);color:#fff;}
+  .view:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .url{display:none;font-size:8.5px;color:var(--wine);margin:8px 0 0;word-break:break-all;
+    font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+    border-top:1px solid var(--line);padding-top:6px;}
+
+  .verdict{margin-top:20px;background:var(--wine);color:#fff;border-radius:14px;padding:16px 20px;}
+  .verdict h4{font-family:'Fraunces',serif;font-style:italic;font-weight:500;font-size:17px;margin:0 0 8px;}
+  .verdict p{margin:0 0 5px;font-size:12.5px;color:#F0DDE4;}
+  .verdict p:last-child{margin-bottom:0;}
+  .verdict b{color:#fff;}
+  .verdict .g{color:#F0C778;font-weight:600;}
+
+  .foot{margin-top:14px;font-size:10px;color:var(--muted);}
+  .foot b{color:var(--ink);}
+  #pdfbtn{float:right;margin-top:-46px;font-family:'DM Sans',sans-serif;font-size:10.5px;font-weight:600;
+    letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--wine);border:0;
+    border-radius:20px;padding:8px 15px;cursor:pointer;}
+  #pdfbtn:hover{background:var(--ink);}
+  @media print{#pdfbtn{display:none !important;}}
+  @media (max-width:700px){#pdfbtn{float:none;margin:8px 0 0;}}
+
+  @media (max-width:700px){.grid{grid-template-columns:1fr;}.sheet{padding:24px 16px;}h1{font-size:31px;}}
+  @media print{
+    html,body{background:#fff !important;}
+    *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+    .sheet{padding:0;max-width:100%;}
+    .card,.verdict{break-inside:avoid;page-break-inside:avoid;}
+    .grid{gap:11px;}
+    .swap{display:none !important;}
+    .view{display:none !important;}
+    .url{display:block;}
+    a.name{color:var(--ink);text-decoration:none;}
+    /* tighten so it lands on one page with photos */
+    h1{font-size:30px;}
+    .sheet{padding-top:2mm;}
+    .hr{margin:13px 0;}
+    .slot{aspect-ratio:16/9;}
+    .card{border-radius:11px;}
+    .body{padding:10px 12px 11px;}
+    .verdict{margin-top:13px;padding:12px 16px;}
+    .foot{margin-top:9px;}
+    @page{margin:9mm;size:letter portrait;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="eyebrow">Gals' Weekend · Aug 28–30</div>
+  <h1>Pick a <em>house</em>.</h1>
+  <button id="pdfbtn" onclick="window.print()">Save as PDF &#8595;</button>
+  <p class="sub">All four are ~2 hrs away and Superhost-rated. The real deciders: <b>hot tub + sauna</b>, <b>how many of us fit</b>, and <b>price</b>.</p>
+
+  <hr class="hr">
+
+  <div class="grid">
+
+    <!-- 1 -->
+    <div class="card">
+      <button class="slot" data-src="images/snowfox.jpg">
+        <div class="ph"><span>Add photo</span><small>click to drop an image</small></div>
+        <div class="swap">Click to swap</div>
+      </button>
+      <div class="body">
+        <p class="name"><a class="name" href="https://www.airbnb.com/rooms/700248996520600743" target="_blank" rel="noopener">SnowFox Haus</a></p>
+        <p class="where">Vail · <b>★5.0</b> · sleeps 6</p>
+        <div class="cost"><span class="n">$371</span><span class="u">per person, 2 nights</span></div>
+        <div class="chips"><span class="c off">no hot tub</span><span class="c off">no sauna</span><span class="c on">pool</span><span class="c on">5 min to Village</span></div>
+        <p class="line up"><b>+</b><span>Closest to shopping; great game + movie setup.</span></p>
+        <p class="line dn"><b>–</b><span>No hot tub or sauna. Only sleeps 6.</span></p>
+        <a class="view" href="https://www.airbnb.com/rooms/700248996520600743" target="_blank" rel="noopener">View listing &#8599;</a>
+        <p class="url">airbnb.com/rooms/700248996520600743</p>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="card">
+      <button class="slot" data-src="images/condor.jpg">
+        <div class="ph"><span>Add photo</span><small>click to drop an image</small></div>
+        <div class="swap">Click to swap</div>
+      </button>
+      <div class="body">
+        <p class="name"><a class="name" href="https://www.airbnb.com/rooms/49944062" target="_blank" rel="noopener">Condor by AvantStay</a></p>
+        <p class="where">Vail · <b>★4.75</b> · sleeps 12</p>
+        <div class="cost"><span class="n">$463</span><span class="u">per person, 2 nights</span></div>
+        <div class="chips"><span class="c on">hot tub</span><span class="c on">sauna</span><span class="c on">glass-ceiling sunroom</span></div>
+        <p class="line up"><b>+</b><span>Soak under the stars. Most space — only 1 bunk.</span></p>
+        <p class="line dn"><b>–</b><span>Priciest. No A/C.</span></p>
+        <a class="view" href="https://www.airbnb.com/rooms/49944062" target="_blank" rel="noopener">View listing &#8599;</a>
+        <p class="url">airbnb.com/rooms/49944062</p>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="card pick">
+      <button class="slot" data-src="images/breckhaus.jpg">
+        <div class="ph"><span>Add photo</span><small>click to drop an image</small></div>
+        <span class="badge">Best fit</span>
+        <div class="swap">Click to swap</div>
+      </button>
+      <div class="body">
+        <p class="name"><a class="name" href="https://www.airbnb.com/rooms/1095746930884903746" target="_blank" rel="noopener">Breckhaus A-Frame</a></p>
+        <p class="where">Breckenridge · <b>★4.99</b> · sleeps 8</p>
+        <div class="cost"><span class="n">$412</span><span class="u">per person, 2 nights</span></div>
+        <div class="chips"><span class="c on">hot tub</span><span class="c off">no sauna</span><span class="c on">yoga loft</span><span class="c on">fire pit</span></div>
+        <p class="line up"><b>+</b><span>Yoga loft, fire pit, arcade, chef's kitchen. Top 1%.</span></p>
+        <p class="line dn"><b>–</b><span>No sauna. 12 min to Main Street.</span></p>
+        <a class="view" href="https://www.airbnb.com/rooms/1095746930884903746" target="_blank" rel="noopener">View listing &#8599;</a>
+        <p class="url">airbnb.com/rooms/1095746930884903746</p>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="card pick">
+      <button class="slot" data-src="images/erica.jpg">
+        <div class="ph"><span>Add photo</span><small>click to drop an image</small></div>
+        <span class="badge gold">Best value</span>
+        <div class="swap">Click to swap</div>
+      </button>
+      <div class="body">
+        <p class="name"><a class="name" href="https://www.airbnb.com/rooms/1374100344543937848" target="_blank" rel="noopener">Chalet Erica</a></p>
+        <p class="where">Breckenridge · <b>★4.9</b> · sleeps 10</p>
+        <div class="cost"><span class="n">$312</span><span class="u">per person, 2 nights</span></div>
+        <div class="chips"><span class="c on">hot tub</span><span class="c on">sauna</span><span class="c on">chef's kitchen</span></div>
+        <p class="line up"><b>+</b><span>Sauna, hot tub, best kitchen — and cheapest.</span></p>
+        <p class="line dn"><b>–</b><span>Newest listing (29 reviews).</span></p>
+        <a class="view" href="https://www.airbnb.com/rooms/1374100344543937848" target="_blank" rel="noopener">View listing &#8599;</a>
+        <p class="url">airbnb.com/rooms/1374100344543937848</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="verdict">
+    <h4>If we're deciding fast</h4>
+    <p><span class="g">Only Condor and Chalet Erica have both a sauna and a hot tub.</span> SnowFox has neither — cut it unless shopping wins.</p>
+    <p><b>Breckhaus</b> nails the most of our list (yoga loft, fire pit, games). <b>Chalet Erica</b> is sauna + hot tub for the least money. <b>Condor</b> if the group runs big.</p>
+  </div>
+
+  <p class="foot"><b>Tap any photo to swap in your own; tap a house name or “View listing” to open it on Airbnb.</b> Prices assume the same group size across all four — reconfirm once we lock a house and headcount.</p>
+
+</div>
+
+<script>
+(function(){
+  var input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  var active = null;
+
+  input.addEventListener('change', function(){
+    var f = input.files && input.files[0];
+    if(!f || !active) return;
+    var url = URL.createObjectURL(f);
+    setImg(active, url);
+    input.value = '';
+  });
+
+  function setImg(slot, url){
+    var img = slot.querySelector('img');
+    if(!img){
+      img = document.createElement('img');
+      slot.insertBefore(img, slot.firstChild);
+    }
+    img.src = url;
+    img.alt = '';
+    var ph = slot.querySelector('.ph');
+    if(ph) ph.style.display = 'none';
+  }
+
+  document.querySelectorAll('.slot').forEach(function(slot){
+    // preload the listing's own photo; fall back to the placeholder if it won't load
+    var src = slot.getAttribute('data-src');
+    if(src){
+      var test = new Image();
+      test.onload = function(){ setImg(slot, src); };
+      test.src = src;
+    }
+    slot.addEventListener('click', function(){ active = slot; input.click(); });
+  });
+})();
+</script>
+</body>
+</html>
